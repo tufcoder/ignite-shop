@@ -18,4 +18,9 @@ export const globalStyles = globalCss({
     fontFamily: 'Roboto',
     fontWeight: 400,
   },
+
+  img: {
+    maxWidth: '100%',
+    height: "auto",
+  },
 })
