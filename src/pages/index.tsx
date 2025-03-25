@@ -4,7 +4,7 @@ const Button = styled('button', {
   border: 0,
   borderRadius: 4,
   padding: '4px 8px',
-  backgroundColor: '$rocketseat',
+  backgroundColor: '$green300',
 
   span: {
     fontWeight: 'bold',
