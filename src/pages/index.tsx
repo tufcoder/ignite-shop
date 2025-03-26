@@ -6,6 +6,7 @@ import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
 
 import { HomeContainer, Product } from "../styles/pages/home";
+import { priceFormatToBRL } from "../utils/functions";
 
 interface HomeProps {
   products: {
@@ -59,7 +60,7 @@ export const getStaticProps:GetStaticProps = async () => {
       id: product.id,
       name: product.name,
       imageUrl: product.images[0],
-      price: price.unit_amount
+      price: priceFormatToBRL(price.unit_amount / 100)
     }
   })
 
