@@ -1,12 +1,16 @@
+import path from "node:path";
+import { readFileSync } from 'node:fs'
 import { GetStaticProps } from "next";
+import Link from "next/link";
 import Image from "next/image";
 import Stripe from "stripe";
 import { stripe } from "../lib/stripe";
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
 
-import { HomeContainer, Product } from "../styles/pages/home";
 import { priceFormatToBRL } from "../utils/functions";
+
+import { HomeContainer, Product } from "../styles/pages/home";
 
 interface HomeProps {
   products: {
@@ -14,6 +18,7 @@ interface HomeProps {
     name: string
     imageUrl: string
     price: number
+    blurDataUrl: string
   }[]
 }
 
@@ -28,21 +33,23 @@ export default function Home({ products }:HomeProps) {
   return (
     <HomeContainer ref={sliderRef} className="keen-slider">
       {products.map(product => (
-        <Product key={product.id} className="keen-slider__slide">
-        <Image
-          src={product.imageUrl}
-          width={520}
-          height={480}
-          alt=""
-          placeholder="blur"
-          blurDataURL={`data:${product.imageUrl}`}
-        />
+        <Link key={product.id} href={`/product/${product.id}`}>
+          <Product className="keen-slider__slide" aria-label={product.name}>
+            <Image
+              src={product.imageUrl}
+              width={520}
+              height={480}
+              alt=""
+              placeholder="blur"
+              blurDataURL={product.blurDataUrl}
+            />
 
-        <footer>
-          <strong>{product.name}</strong>
-          <span>{product.price}</span>
-        </footer>
-      </Product>
+            <footer>
+              <strong>{product.name}</strong>
+              <span>{product.price}</span>
+            </footer>
+          </Product>
+        </Link>
       ))}
     </HomeContainer>
   )
@@ -53,15 +60,26 @@ export const getStaticProps:GetStaticProps = async () => {
     expand: ['data.default_price']
   })
 
-  const products = response.data.map(product => {
+  const products = response.data.map((product) => {
     const price = product.default_price as Stripe.Price
+    const imageUrl = product.images[0]
 
     return {
       id: product.id,
       name: product.name,
-      imageUrl: product.images[0],
-      price: priceFormatToBRL(price.unit_amount / 100)
+      imageUrl: imageUrl,
+      price: priceFormatToBRL(price.unit_amount / 100),
+      blurDataUrl: '',
     }
+  })
+
+  const blurPath = path.resolve('./public/blur.jpeg')
+  const blurBase64 = readFileSync(blurPath).toString('base64')
+  const blurDataUrl = `data:image/jpeg;base64,${blurBase64}`
+
+  // feito dessa forma para o JSON não serializar com uma Promise
+  products.map((product) => {
+    product.blurDataUrl = blurDataUrl;
   })
 
   return {

@@ -9,7 +9,7 @@ export const HomeContainer = styled('main', {
   marginInlineStart: 'auto',
 })
 
-export const Product = styled('a', {
+export const Product = styled('article', {
   position: 'relative',
   display: "flex",
   alignItems: "center",
@@ -20,6 +20,13 @@ export const Product = styled('a', {
   cursor: 'pointer',
   background: 'linear-gradient(180deg, #1ea483 0%, #7465d4 100%)',
   overflow: "hidden",
+
+  '&:hover': {
+    footer: {
+      transform: 'translateY(0%)',
+      opacity: 1,
+    },
+  },
 
   img: {
     objectFit: "cover",
@@ -43,19 +50,13 @@ export const Product = styled('a', {
 
     strong: {
       fontSize: '$lg',
+      color: '$gray100',
     },
 
     span: {
       fontSize: '$xl',
       fontWeight: 'bold',
       color: '$green300',
-    },
-  },
-
-  '&:hover': {
-    footer: {
-      transform: 'translateY(0%)',
-      opacity: 1,
     },
   },
 })
