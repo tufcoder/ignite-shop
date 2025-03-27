@@ -1,7 +1,10 @@
+import axios from "axios"
+import { useState } from "react"
 import { GetStaticPaths, GetStaticProps } from "next"
+import { useRouter } from "next/router"
+import Head from "next/head"
 import Image from "next/image"
 import Stripe from "stripe"
-import axios from "axios"
 
 import { stripe } from "../../lib/stripe"
 import { generateBlurDataUrl, priceFormatToBRL } from "../../utils/functions"
@@ -11,8 +14,6 @@ import {
   ProductContainer,
   ProductDetails
 } from "../../styles/pages/product"
-import { useRouter } from "next/router"
-import { useState } from "react"
 
 interface ProductProps {
   product: {
@@ -53,22 +54,28 @@ export default function Product({ product }: ProductProps) {
   }
 
   return (
-    <ProductContainer>
-      <ImageContainer>
-        <Image src={product.imageUrl} width={520} height={480} alt="" />
-      </ImageContainer>
+    <>
+      <Head>
+        <title>{product.name} | Ignite Shop</title>
+      </Head>
 
-      <ProductDetails>
-        <h1>{product.name}</h1>
-        <span>{product.price}</span>
+      <ProductContainer>
+        <ImageContainer>
+          <Image src={product.imageUrl} width={520} height={480} alt="" />
+        </ImageContainer>
 
-        <p>{product.description}</p>
+        <ProductDetails>
+          <h1>{product.name}</h1>
+          <span>{product.price}</span>
 
-        <button onClick={handleByProduct} disabled={isCreatingCheckoutSession}>
-          Comprar agora
-        </button>
-      </ProductDetails>
-    </ProductContainer>
+          <p>{product.description}</p>
+
+          <button onClick={handleByProduct} disabled={isCreatingCheckoutSession}>
+            Comprar agora
+          </button>
+        </ProductDetails>
+      </ProductContainer>
+    </>
   )
 }
 
