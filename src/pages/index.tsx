@@ -1,14 +1,12 @@
-import path from "node:path";
-import { readFileSync } from 'node:fs'
 import { GetStaticProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import Stripe from "stripe";
-import { stripe } from "../lib/stripe";
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
 
-import { priceFormatToBRL } from "../utils/functions";
+import { stripe } from "../lib/stripe";
+import { generateBlurDataUrl, priceFormatToBRL } from "../utils/functions";
 
 import { HomeContainer, Product } from "../styles/pages/home";
 
@@ -17,7 +15,7 @@ interface HomeProps {
     id: string
     name: string
     imageUrl: string
-    price: number
+    price: string
     blurDataUrl: string
   }[]
 }
@@ -73,13 +71,9 @@ export const getStaticProps:GetStaticProps = async () => {
     }
   })
 
-  const blurPath = path.resolve('./public/blur.jpeg')
-  const blurBase64 = readFileSync(blurPath).toString('base64')
-  const blurDataUrl = `data:image/jpeg;base64,${blurBase64}`
-
   // feito dessa forma para o JSON não serializar com uma Promise
   products.map((product) => {
-    product.blurDataUrl = blurDataUrl;
+    product.blurDataUrl = generateBlurDataUrl();
   })
 
   return {
