@@ -18,6 +18,7 @@ export const SuccessContainer = styled('main', {
     marginBlockStart: '2rem',
     fontSize: '$xl',
     lineHeight: 1.4,
+    textAlign: "center",
     color: '$gray300',
   },
 
@@ -28,6 +29,11 @@ export const SuccessContainer = styled('main', {
     fontWeight: 'bold',
     textDecoration: 'none',
     color: '$green500',
+    transition: 'color 0.3s ease',
+
+    '&:hover': {
+      color: '$green300',
+    },
   },
 })
 
