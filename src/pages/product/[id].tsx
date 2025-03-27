@@ -20,6 +20,7 @@ interface ProductProps {
     price: string
     blurDataUrl: string
     description: string
+    defaultPriceId: string
   }
 }
 
@@ -28,6 +29,20 @@ export default function Product({ product }: ProductProps) {
 
   if (isFallback) {
     return <p>Loading...</p>
+  }
+
+  async function handleByProduct() {
+    console.log(product.defaultPriceId)
+    const response = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ priceId: product.defaultPriceId }), // Envia o priceId no body
+    });
+
+    const { checkoutUrl } = await response.json()
+    console.log(checkoutUrl)
   }
 
   return (
@@ -42,7 +57,7 @@ export default function Product({ product }: ProductProps) {
 
         <p>{product.description}</p>
 
-        <button>
+        <button onClick={handleByProduct}>
           Comprar agora
         </button>
       </ProductDetails>
@@ -87,6 +102,7 @@ export const getStaticProps: GetStaticProps<
         price: priceFormatToBRL(price.unit_amount / 100),
         blurDataUrl: generateBlurDataUrl(),
         description: product.description,
+        defaultPriceId: price.id,
       }
     },
     revalidate: 60 * 60 * 1, // 1 hour
