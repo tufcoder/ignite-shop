@@ -7,12 +7,14 @@ import Stripe from "stripe";
 import { stripe } from "../lib/stripe";
 
 import { ImageContainer, SuccessContainer } from "../styles/pages/success";
+import { generateBlurDataUrl } from "../utils/functions";
 
 interface SuccessProps {
   customerName: string
   product: {
     name: string
     imageUrl: string
+    blurDataUrl: string
   }
 }
 
@@ -29,7 +31,14 @@ export default function Success({ customerName, product }:SuccessProps) {
         <h1>Compra efeturada</h1>
 
         <ImageContainer>
-          <Image src={product.imageUrl} width={120} height={110} alt="" />
+          <Image
+            src={product.imageUrl}
+            width={120}
+            height={110}
+            alt=""
+            placeholder="blur"
+            blurDataURL={product.blurDataUrl}
+          />
         </ImageContainer>
 
         <p>
@@ -69,6 +78,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       product: {
         name: product.name,
         imageUrl: product.images[0],
+        blurDataUrl: generateBlurDataUrl(),
       },
     },
   }
