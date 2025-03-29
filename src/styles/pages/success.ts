@@ -41,15 +41,23 @@ export const ImageContainer = styled('div', {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: '100%',
   height: 145,
-  maxWidth: 130,
+  width: 140,
   marginBlockStart: '4rem',
-  borderRadius: 8,
+  marginInlineStart: '-2rem',
+  borderRadius: '50%',
   padding: '0.25rem',
   background: 'linear-gradient(180deg, #1ea4b3 0%, #7465d4 100%)',
+  boxShadow: '-1px 1px 8px rgba(0, 0, 0, 0.3)',
 
   img: {
     objectFit: "cover",
   },
+})
+
+export const ProductsContainer = styled('div', {
+  display: "flex",
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBlockEnd: '4rem',
 })

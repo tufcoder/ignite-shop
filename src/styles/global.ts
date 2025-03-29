@@ -1,4 +1,4 @@
-import { globalCss } from ".";
+import { globalCss, theme } from ".";
 
 export const globalStyles = globalCss({
   '*': {
@@ -8,8 +8,8 @@ export const globalStyles = globalCss({
   },
 
   body: {
-    backgroundColor: '$gray900',
-    color: '$gray100',
+    backgroundColor: theme.colors.gray900,
+    color: theme.colors.gray100,
 
     'webkit-font-smoothing': 'antialiased',
     'moz-osx-font-smoothing': 'grayscale',

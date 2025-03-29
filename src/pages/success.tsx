@@ -5,20 +5,24 @@ import Head from "next/head";
 import Stripe from "stripe";
 
 import { stripe } from "../lib/stripe";
-
-import { ImageContainer, SuccessContainer } from "../styles/pages/success";
 import { generateBlurDataUrl } from "../utils/functions";
+
+import {
+  ImageContainer,
+  ProductsContainer,
+  SuccessContainer
+} from "../styles/pages/success";
 
 interface SuccessProps {
   customerName: string
-  product: {
-    name: string
+  products: {
+    id: string
     imageUrl: string
     blurDataUrl: string
-  }
+  }[]
 }
 
-export default function Success({ customerName, product }:SuccessProps) {
+export default function Success({ customerName, products }:SuccessProps) {
   return (
     <>
       <Head>
@@ -28,21 +32,25 @@ export default function Success({ customerName, product }:SuccessProps) {
       </Head>
 
       <SuccessContainer>
-        <h1>Compra efeturada</h1>
+        <ProductsContainer>
+          {products.map(product => (
+            <ImageContainer key={product.id}>
+              <Image
+                src={product.imageUrl}
+                width={120}
+                height={110}
+                alt=""
+                placeholder="blur"
+                blurDataURL={product.blurDataUrl}
+              />
+            </ImageContainer>
+          ))}
+        </ProductsContainer>
 
-        <ImageContainer>
-          <Image
-            src={product.imageUrl}
-            width={120}
-            height={110}
-            alt=""
-            placeholder="blur"
-            blurDataURL={product.blurDataUrl}
-          />
-        </ImageContainer>
+        <h1>Compra efetuada!</h1>
 
         <p>
-          Uhuul <strong>{customerName}</strong>, sua <strong>{product.name}</strong> já está a caminho da sua casa.
+          Uhuul <strong>{customerName}</strong>, sua compra de {products.length} camisetas já está a caminho da sua casa.
         </p>
 
         <Link href="/">
@@ -70,16 +78,24 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   })
 
   const customerName = session.customer_details.name
-  const product = session.line_items.data[0].price.product as Stripe.Product
+  const products = session.line_items.data.map((item) => {
+    const product = item.price.product as Stripe.Product
+
+    return {
+      id: item.price.id,
+      imageUrl: product.images[0],
+      blurDataUrl: '',
+    }
+  })
+
+  products.map((product) => {
+    product.blurDataUrl = generateBlurDataUrl();
+  })
 
   return {
     props: {
       customerName,
-      product: {
-        name: product.name,
-        imageUrl: product.images[0],
-        blurDataUrl: generateBlurDataUrl(),
-      },
+      products,
     },
   }
 }

@@ -1,26 +1,30 @@
-import axios from "axios"
-import { useState } from "react"
+import { useContext } from "react"
 import { GetStaticPaths, GetStaticProps } from "next"
 import { useRouter } from "next/router"
+import { CaretLeft } from "@phosphor-icons/react"
 import Head from "next/head"
 import Image from "next/image"
 import Stripe from "stripe"
 
+import { ProductContext } from "../../context/ProductContext"
 import { stripe } from "../../lib/stripe"
-import { generateBlurDataUrl, priceFormatToBRL } from "../../utils/functions"
+import { generateBlurDataUrl } from "../../utils/functions"
+import { priceFormatToBRL } from "../../utils/price-formatter"
 
 import {
   ImageContainer,
   ProductContainer,
-  ProductDetails
+  ProductDetails,
+  ProductNavigation,
 } from "../../styles/pages/product"
+import Link from "next/link"
 
 interface ProductProps {
   product: {
     id: string
     name: string
     imageUrl: string
-    price: string
+    price: number
     blurDataUrl: string
     description: string
     defaultPriceId: string
@@ -28,29 +32,13 @@ interface ProductProps {
 }
 
 export default function Product({ product }: ProductProps) {
-  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false)
+  const { handleAddItemInBag, isItemInBag } = useContext(ProductContext)
   const { isFallback } = useRouter()
+
+  const disabled = isItemInBag(product)
 
   if (isFallback) {
     return <p>Loading...</p>
-  }
-
-  async function handleByProduct() {
-    try {
-      setIsCreatingCheckoutSession(true)
-
-      const response = await axios.post('/api/checkout', {
-        priceId: product.defaultPriceId,
-      })
-
-      const { checkoutUrl } = response.data
-
-      window.location.href = checkoutUrl
-    } catch (error) {
-      // Conectar com uma ferramenta de observabilidade (Datadog / Sentry)
-      setIsCreatingCheckoutSession(false)
-      console.error('Error redirecting to checkout', error)
-    }
   }
 
   return (
@@ -59,6 +47,12 @@ export default function Product({ product }: ProductProps) {
         <title>{`${product.name} | Ignite Shop`}</title>
       </Head>
 
+      <ProductNavigation>
+        <Link href="/">
+          <CaretLeft size={32} /> Voltar
+        </Link>
+      </ProductNavigation>
+
       <ProductContainer>
         <ImageContainer>
           <Image src={product.imageUrl} width={520} height={480} alt="" />
@@ -66,12 +60,15 @@ export default function Product({ product }: ProductProps) {
 
         <ProductDetails>
           <h1>{product.name}</h1>
-          <span>{product.price}</span>
+          <span>{priceFormatToBRL(product.price / 100)}</span>
 
-          <p>{product.description}</p>
+          <textarea disabled value={product.description} />
 
-          <button onClick={handleByProduct} disabled={isCreatingCheckoutSession}>
-            Comprar agora
+          <button
+            onClick={() => handleAddItemInBag(product)}
+            disabled={disabled}
+          >
+            Colocar na sacola
           </button>
         </ProductDetails>
       </ProductContainer>
@@ -106,6 +103,7 @@ export const getStaticProps: GetStaticProps<
 
   const price = product.default_price as Stripe.Price
   const imageUrl = product.images[0]
+  const detailed_description = product.metadata?.descricao_detalhada || null
 
   return {
     props: {
@@ -113,9 +111,9 @@ export const getStaticProps: GetStaticProps<
         id: product.id,
         name: product.name,
         imageUrl: imageUrl,
-        price: priceFormatToBRL(price.unit_amount / 100),
+        price: price.unit_amount,
         blurDataUrl: generateBlurDataUrl(),
-        description: product.description,
+        description: detailed_description ?? product.description,
         defaultPriceId: price.id,
       }
     },

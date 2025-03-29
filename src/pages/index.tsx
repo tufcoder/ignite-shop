@@ -1,24 +1,18 @@
 import { GetStaticProps } from "next";
 import Head from "next/head";
-import Link from "next/link";
-import Image from "next/image";
 import Stripe from "stripe";
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
 
+import { ProductType } from "../context/ProductContext";
+import { Product } from "../components/product";
 import { stripe } from "../lib/stripe";
-import { generateBlurDataUrl, priceFormatToBRL } from "../utils/functions";
+import { generateBlurDataUrl } from "../utils/functions";
 
-import { HomeContainer, Product } from "../styles/pages/home";
+import { HomeContainer } from "../styles/pages/home";
 
 interface HomeProps {
-  products: {
-    id: string
-    name: string
-    imageUrl: string
-    price: string
-    blurDataUrl: string
-  }[]
+  products: ProductType[]
 }
 
 export default function Home({ products }:HomeProps) {
@@ -37,23 +31,7 @@ export default function Home({ products }:HomeProps) {
 
       <HomeContainer ref={sliderRef} className="keen-slider">
         {products.map(product => (
-          <Link key={product.id} href={`/product/${product.id}`} prefetch={false}>
-            <Product className="keen-slider__slide" aria-label={product.name}>
-              <Image
-                src={product.imageUrl}
-                width={520}
-                height={480}
-                alt=""
-                placeholder="blur"
-                blurDataURL={product.blurDataUrl}
-              />
-
-              <footer>
-                <strong>{product.name}</strong>
-                <span>{product.price}</span>
-              </footer>
-            </Product>
-          </Link>
+          <Product key={product.id} product={product} />
         ))}
       </HomeContainer>
     </>
@@ -73,8 +51,9 @@ export const getStaticProps:GetStaticProps = async () => {
       id: product.id,
       name: product.name,
       imageUrl: imageUrl,
-      price: priceFormatToBRL(price.unit_amount / 100),
+      price: price.unit_amount,
       blurDataUrl: '',
+      defaultPriceId: price.id,
     }
   })
 

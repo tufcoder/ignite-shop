@@ -1,5 +1,17 @@
 import { styled } from "@stitches/react";
 
+export const ProductNavigation = styled('nav', {
+  maxWidth: 1180,
+  width: '100%',
+  margin: '0 auto',
+
+  a: {
+    display: 'flex',
+    alignItems: 'center',
+    color: '$white',
+  },
+})
+
 export const ProductContainer = styled('main', {
   display: "grid",
   gridTemplateColumns: '1fr 1fr',
@@ -41,11 +53,20 @@ export const ProductDetails = styled('div', {
     color: '$green300',
   },
 
-  p: {
+  textarea: {
+    height: '100%',
     marginBlockStart: '2.5rem',
     fontSize: '$md',
     lineHeight: 1.6,
     color: '$gray300',
+
+    cursor: 'text',
+    border: 'none',
+    resize: 'none',
+    outline: "none",
+    whiteSpace: 'pre-wrap',
+    font: 'inherit',
+    background: 'inherit',
   },
 
   button: {
